@@ -20,7 +20,6 @@ import com.qqdiary.app.module.DiaryFolder;
 import com.qqdiary.app.module.GeneralDiary;
 import com.qqdiary.app.service.DiaryService;
 import com.qqdiary.app.service.DiaryShare;
-import com.qqdiary.app.ui.manageview.IconImageFactory;
 import com.qqdiary.app.ui.manageview.ManageViewPage;
 import com.qqdiary.app.ui.searchview.SearchViewPage;
 import com.qqdiary.app.ui.welcomeview.WelcomeViewPage;

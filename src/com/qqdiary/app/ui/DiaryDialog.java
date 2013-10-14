@@ -41,7 +41,6 @@ import com.qqdiary.app.module.GeneralDiary;
 import com.qqdiary.app.module.DiaryAttachment.AttachmentStatus;
 import com.qqdiary.app.ui.manageview.AttachmentFileFilter;
 import com.qqdiary.app.ui.manageview.AttachmentListCellRender;
-import com.qqdiary.app.ui.manageview.IconImageFactory;
 
 /**
  * 日记显示、编辑界面类

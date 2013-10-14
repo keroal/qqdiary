@@ -23,7 +23,7 @@ public class IconImageFactory {
 		return iconFactoryFactory;
 	}
 	
-	public Icon createIconByName(String name) {
+	public ImageIcon createIconByName(String name) {
 		String path = RESOURCE_FOLDER_PATH + name;
 		return new ImageIcon(getClass().getResource(path));
 	}

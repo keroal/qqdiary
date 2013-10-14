@@ -17,7 +17,6 @@ import javax.swing.JTextField;
 
 import com.eltima.components.ui.DatePicker;
 import com.qqdiary.app.module.DayInformationProvider;
-import com.qqdiary.app.ui.manageview.IconImageFactory;
 
 /**
  * 配置信息设置对话框类

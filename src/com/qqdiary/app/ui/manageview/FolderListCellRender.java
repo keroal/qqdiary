@@ -8,6 +8,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 
 import com.qqdiary.app.module.DiaryFolder;
+import com.qqdiary.app.ui.IconImageFactory;
 
 /**
  * 分类JList显示样式类
@@ -22,7 +23,7 @@ public class FolderListCellRender extends DefaultListCellRenderer {
 	        	return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 	       JLabel jl = (JLabel)super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 	       DiaryFolder folder = (DiaryFolder) value;
-	       jl.setIcon(new ImageIcon(getClass().getResource("res/folder.png"))); 
+	       jl.setIcon(IconImageFactory.getInstance().createIconByName("folder.png")); 
 	       jl.setText(folder.getName());
 	       jl.setToolTipText(folder.getDescribe());
 	       return jl;

@@ -7,6 +7,7 @@ import java.awt.Toolkit;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
+import com.qqdiary.app.ui.IconImageFactory;
 import com.qqdiary.app.ui.ViewPanel;
 
 /**
@@ -22,7 +23,7 @@ public class WelcomeViewPage extends ViewPanel {
 		// TODO Auto-generated constructor stub
 		
 		setViewLayout(new BorderLayout());
-		ImageIcon image = new ImageIcon(this.getClass().getResource("res/welcome.png"));
+		ImageIcon image = IconImageFactory.getInstance().createIconByName("welcome.png");
 		JLabel lable = new JLabel(image);
 		Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
 		lable.setBounds(0,0,dimension.width, dimension.height);

@@ -9,6 +9,7 @@ import javax.swing.JList;
 
 import com.qqdiary.app.module.DiaryAttachment;
 import com.qqdiary.app.module.DiaryFolder;
+import com.qqdiary.app.ui.IconImageFactory;
 
 /**
  * 附件JList显示样式类
@@ -30,7 +31,7 @@ public class AttachmentListCellRender  extends DefaultListCellRenderer {
 	   }
 	 
 	 private ImageIcon selectAttachmentIcon(DiaryAttachment attachment){
-		 String name = IconImageFactory.DEFAULT_ICON_NAME;
+		 String name = IconImageFactory.DEFAULT_ICON_PATH;
 		 
 		 if (attachment.getType().contains("图片")) {
 			 name = "picture.png";
