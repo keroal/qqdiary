@@ -4,7 +4,14 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 日记数据类
+ * @author Administrator
+ *
+ */
 public class GeneralDiary implements Serializable{
+	
+	/**日记基本属性*/
 	private String id;
 	private DiaryFolder folder;
 	private String title;
@@ -12,15 +19,19 @@ public class GeneralDiary implements Serializable{
 	private String content;
 	private String weather;
 	private boolean hasAttachement;
+	private boolean isNew;
 	private List<DiaryAttachment> attachmentList;
+
 	
 	public GeneralDiary() {
+		this.id = IDFactiory.getInstance().createDiaryID();
+		this.isNew = true;
 		this.setHasAttachement(false);
 		this.attachmentList = new ArrayList<DiaryAttachment>();
 	}
 	
 	
-	public GeneralDiary(String id, DiaryFolder folder, String title, String date, String weather, String content, boolean hasAttach) {
+	public GeneralDiary(String id, DiaryFolder folder, String title, String date, String weather, String content, boolean hasAttach, List<DiaryAttachment> list) {
 		this.id = id;
 		this.setFolder(folder);
 		this.title = title;
@@ -28,7 +39,7 @@ public class GeneralDiary implements Serializable{
 		this.weather = weather;
 		this.content = content;
 		this.hasAttachement = hasAttach;
-		this.attachmentList = new ArrayList<DiaryAttachment>();
+		this.attachmentList = list;
 	}
 	
 	public String getId() {
@@ -86,10 +97,6 @@ public class GeneralDiary implements Serializable{
 		return title;
 	}
 
-
-
-
-
 	public boolean isHasAttachement() {
 		return hasAttachement;
 	}
@@ -108,9 +115,15 @@ public class GeneralDiary implements Serializable{
 	public void setFolder(DiaryFolder folder) {
 		this.folder = folder;
 	}
-	
-	public List<DiaryAttachment> getAttachments(){
-		return null;
+
+
+	public boolean isNew() {
+		return isNew;
+	}
+
+
+	public void setNew(boolean isNew) {
+		this.isNew = isNew;
 	}
 	
 	

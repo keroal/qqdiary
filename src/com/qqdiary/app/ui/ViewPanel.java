@@ -11,6 +11,11 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+/**
+ * 显示视图基础类
+ * @author Administrator
+ *
+ */
 public class ViewPanel extends JPanel {
 	private JPanel tagPanel;
 	private JPanel mainPanel;

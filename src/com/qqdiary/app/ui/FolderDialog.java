@@ -3,6 +3,9 @@ package com.qqdiary.app.ui;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -16,8 +19,15 @@ import javax.swing.JTextField;
 import com.qqdiary.app.closure.ICallback;
 import com.qqdiary.app.module.DiaryFolder;
 
+/**
+ * 分类添加、修改界面类
+ * @author Administrator
+ *
+ */
 public class FolderDialog extends JDialog{
 	private DiaryFolder folder;
+	
+	/**传入的回调函数指针，用于保存分类信息*/
 	private ICallback callback;
 	
 	private ViewPanel viewPanel;
@@ -44,7 +54,9 @@ public class FolderDialog extends JDialog{
 		initComponet();
 	}
 	
-	
+	/**
+	 * 初始化界面控件
+	 */
 	private void initComponet(){
 		this.setTitle("添加分类");
 		this.setSize(300, 150);
@@ -69,7 +81,7 @@ public class FolderDialog extends JDialog{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				
+				saveFolder();
 			}
 		});
 		
@@ -96,20 +108,45 @@ public class FolderDialog extends JDialog{
 		viewPanel.addComponent(descirptPanel, "Center");
 		viewPanel.addComponent(buttonPanel, "South");
 		this.add(viewPanel);
+		
 	}
 	
+	/**
+	 * 初始化界面数据
+	 */
 	private void initComponentValue(){
 		nameField.setText(folder.getName());
 		descripteField.setText(folder.getDescribe());
 	}
 	
+	/**
+	 * 界面数据对象化操作
+	 */
 	private void saveComponentValue(){
 		folder.setName(nameField.getText());
 		folder.setDescribe(descripteField.getText());
 	}
+	
+	/**
+	 * 保存操作响应函数
+	 */
+	private void saveFolder(){
+		saveComponentValue();
+		if (folder.getName().isEmpty()) {
+			JOptionPane.showMessageDialog(null, "分类名称不能为空！");
+			return;
+		}
+		
+		/**直接调用回调函数保存分类信息*/
+		callback.callback(folder);
+		this.dispose();
+	}
 
+	/**
+	 * 退出操作响应函数
+	 */
 	private void exitDialog(){
-		int select = JOptionPane.showConfirmDialog( null , "确定要退出！" , "提示", JOptionPane.YES_NO_OPTION );
+		int select = JOptionPane.showConfirmDialog( null , "确定直接退出？" , "提示", JOptionPane.YES_NO_OPTION );
 		if (select == JOptionPane.YES_OPTION) {
 			this.dispose();
 		}

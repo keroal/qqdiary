@@ -4,29 +4,27 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 日记分数据类
+ * @author Administrator
+ *
+ */
 public class DiaryFolder implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
+	
+	/**日记分类基本属性*/
 	private String id;
 	private String name;
 	private String describe;
-	private List<GeneralDiary> diaryList;
-	
+	private boolean isNew;//日记状态标识
+	private List<GeneralDiary> diariesList;
+
 	public DiaryFolder(){
-		List<GeneralDiary> diaryList = new ArrayList<GeneralDiary>();
+		this.isNew = true;
+		this.id = IDFactiory.getInstance().createFolderID();
+		diariesList = new ArrayList<GeneralDiary>();
 	}
-	
-	public DiaryFolder(String name, String describe){
-		this.name = name;
-		this.describe = describe;
-		List<GeneralDiary> diaryList = new ArrayList<GeneralDiary>();
-	}
-	
-	public DiaryFolder(String id, String name, String describe){
-		this.id = id;
-		this.name = name;
-		this.describe = describe;
-		List<GeneralDiary> diaryList = new ArrayList<GeneralDiary>();
-	}
-	
 	
 	public String getId() {
 		return id;
@@ -49,6 +47,22 @@ public class DiaryFolder implements Serializable {
 	
 	public String toString() {
 		return name;
+	}
+
+	public boolean isNew() {
+		return isNew;
+	}
+
+	public void setNew(boolean isNew) {
+		this.isNew = isNew;
+	}
+	
+	public List<GeneralDiary> getDiariesList() {
+		return diariesList;
+	}
+
+	public void setDiariesList(List<GeneralDiary> diariesList) {
+		this.diariesList = diariesList;
 	}
 	
 }	

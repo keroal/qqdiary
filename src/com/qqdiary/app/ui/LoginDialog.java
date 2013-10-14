@@ -1,24 +1,14 @@
 package com.qqdiary.app.ui;
 
-import java.awt.Button;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Frame;
 import java.awt.Image;
-import java.awt.Label;
-import java.awt.TextField;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
@@ -29,6 +19,12 @@ import javax.swing.JTextField;
 import com.qqdiary.app.service.DiaryService;
 import com.qqdiary.app.service.DiaryShare;
 import com.qqdiary.app.service.UserVerify;
+
+/**
+ * 登陆界面对话框类
+ * @author Administrator
+ *
+ */
 public class LoginDialog extends JDialog{
 	private UserVerify service;
 	private JLabel nameLabel;
@@ -49,6 +45,9 @@ public class LoginDialog extends JDialog{
 		initComponent();
 	}
 	
+	/**
+	 * 界面控件初始化
+	 */
 	private void initComponent() {
 		this.setSize(500, 300);
 		this.setLayout(null);

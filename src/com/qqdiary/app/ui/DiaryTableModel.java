@@ -10,7 +10,11 @@ import org.omg.CosNaming.NamingContextExtPackage.AddressHelper;
 
 import com.qqdiary.app.module.GeneralDiary;
 
-
+/**
+ * 自定义日记列表TableModel类
+ * @author Administrator
+ *
+ */
 public class DiaryTableModel extends AbstractTableModel {
 	private static final long serialVersionUID = 1L;
 
@@ -21,8 +25,11 @@ public class DiaryTableModel extends AbstractTableModel {
 		initColumn();
 	} 
 	
+	/**
+	 * 设置日记Table显示的列
+	 */
 	private void initColumn() {
-		column.add("分类");
+		column.add("ID");
 		column.add("时间");
 		column.add("天气");
 		column.add("标题");
@@ -74,12 +81,20 @@ public class DiaryTableModel extends AbstractTableModel {
 		diariesList.remove(diary);
 		return true;
 	}
+	
+	public void removeAllElements() {
+		diariesList.removeAllElements();
+	}
+	
+	public GeneralDiary getElementAt(int columnindex){
+		return (GeneralDiary)diariesList.get(columnindex);
+	}
 
 	
 	private Object getPropertyValueByCol(GeneralDiary diary, int col) { 
 		switch (col) { 
 		case 0: 
-			return diary.getFolder().getName(); 
+			return diary.getId(); 
 		case 1: 
 			return diary.getDate();  
 		case 2: 

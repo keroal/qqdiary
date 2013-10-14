@@ -2,18 +2,31 @@ package com.qqdiary.app.module;
 
 import java.io.File;
 
+/**
+ * 日记附件数据类
+ * @author Administrator
+ *
+ */
 public class DiaryAttachment {
-	
+
+	/**附件基本属性*/
 	private String id;
 	private String diaryId;
 	private String type;
 	private String path;
+	private AttachmentStatus status;//附件状态标识
+	
+	public DiaryAttachment(){
+		this.id = IDFactiory.getInstance().createAttachmentID();
+		this.status = AttachmentStatus.NEW;
+	}
 	
 	public DiaryAttachment(String id, String diaryId, String type, String path){
 		this.id = id;
 		this.diaryId = diaryId;
 		this.type = type;
 		this.path = path;
+		this.status = AttachmentStatus.EXIST;
 	}
 	
 	public String getId() {
@@ -41,4 +54,22 @@ public class DiaryAttachment {
 		this.path = path;
 	}
 	
+	public static String genAttachmentID(){
+		return "";
+	}
+	
+	public AttachmentStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(AttachmentStatus status) {
+		this.status = status;
+	}
+	
+	public static enum AttachmentStatus{
+		EXIST,
+		NEW,
+		DELETE
+	}
+
 }

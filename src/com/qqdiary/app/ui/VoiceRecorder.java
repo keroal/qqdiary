@@ -42,10 +42,18 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.qqdiary.app.closure.Callback;
 import com.qqdiary.app.closure.ICallback;
+import com.qqdiary.app.module.IDFactiory;
 
+
+/**
+ * 录音器功能类
+ * @author Administrator
+ *
+ */
 public class VoiceRecorder extends JDialog {
 
 	private ICallback callback;
@@ -251,26 +259,34 @@ public class VoiceRecorder extends JDialog {
 
         //写入文件
         JFileChooser chooser = new JFileChooser();
-        int result = chooser.showOpenDialog(null);
-        if(result == JFileChooser.APPROVE_OPTION)
-        {
-           String path = chooser.getSelectedFile().getAbsolutePath();
-           
-           try {
-        	   File file = new File(path);
-        	   AudioSystem.write(audioInputStream, AudioFileFormat.Type.WAVE, file);
-               this.callback.callback(path);
-               this.dispose();
-               return;
-           } catch (IOException e) {
-        	   // TODO Auto-generated catch block
-        	   e.printStackTrace();
-           }
+		chooser.setDialogTitle("选择语音");
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("WAV FILES(*.wav)","wav");
+		chooser.setFileFilter(filter);
+		chooser.setSelectedFile(new File(IDFactiory.getInstance().createRandomID()+".wav"));
+		
+        int result = chooser.showSaveDialog(null);
+        if(result == JFileChooser.APPROVE_OPTION) {    
+        	 File file = chooser.getSelectedFile();
+        	 if (file.exists()) {
+        		 int copy = JOptionPane.showConfirmDialog(null,"是否要覆盖当前文件？", "保存", JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE);
+        		 if (copy == JOptionPane.NO_OPTION){
+        			 this.dispose();
+        			return;
+        		 }
+        	 }
+        	 
+        	try {
+				AudioSystem.write(audioInputStream, AudioFileFormat.Type.WAVE, file);
+	         	this.callback.callback(file.getPath());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				JOptionPane.showConfirmDialog(null, "语音文件保存失败！", "提示", JOptionPane.YES_OPTION);
+		        e.printStackTrace();
+			}
+         	this.dispose();
+            return;
         }
-        
-        JOptionPane.showConfirmDialog(null, "语音文件保存失败！", "提示", JOptionPane.YES_OPTION);
-        this.dispose();
-		return;
+     
     }
 
     //取得AudioFormat

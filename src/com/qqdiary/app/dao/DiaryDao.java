@@ -5,11 +5,17 @@ import java.util.List;
 import com.qqdiary.app.module.DiaryAttachment;
 import com.qqdiary.app.module.DiaryFolder;
 import com.qqdiary.app.module.GeneralDiary;
+import com.qqdiary.app.module.SearchParameters;
 
+/**
+ * 数据操作层接口
+ * @author Administrator
+ *
+ */
 public interface DiaryDao {
 	List<GeneralDiary> getDiaries(DiaryFolder folder);
-	List<GeneralDiary> getDiaries(String key);
-	List<GeneralDiary> getDiaries(String sDate, String eDate);
+	List<DiaryAttachment> getDiaryAttachments(GeneralDiary diary);
+	List<GeneralDiary> getDiaries(SearchParameters parameters);
 	
 	List<DiaryFolder> getFolderList();
 	

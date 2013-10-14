@@ -2,39 +2,37 @@ package com.qqdiary.app.ui;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
-import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.DefaultListModel;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.JToolBar;
-import javax.swing.border.TitledBorder;
 
 import com.qqdiary.app.closure.ICallback;
-import com.qqdiary.app.module.CurrentDateInformation;
+import com.qqdiary.app.module.DayInformationProvider;
 import com.qqdiary.app.module.DiaryFolder;
 import com.qqdiary.app.module.GeneralDiary;
 import com.qqdiary.app.service.DiaryService;
 import com.qqdiary.app.service.DiaryShare;
-import com.qqdiary.app.ui.ListCellRenderWithIcon;
+import com.qqdiary.app.ui.manageview.IconImageFactory;
+import com.qqdiary.app.ui.manageview.ManageViewPage;
+import com.qqdiary.app.ui.searchview.SearchViewPage;
+import com.qqdiary.app.ui.welcomeview.WelcomeViewPage;
 
+/**
+ * 主窗口类
+ * @author Administrator
+ *
+ */
 public class MainFrame extends JFrame {
-	private CurrentDateInformation dateInformation = CurrentDateInformation.getInstance();
+	/**单例模式的基本信息类，用于保存当前日期已经天气*/
+	private DayInformationProvider dateInformation = DayInformationProvider.getInstance();
 	private DiaryService service;
 	private DiaryShare	share;
 	
@@ -68,6 +66,7 @@ public class MainFrame extends JFrame {
 	private ManageViewPage managepPage;
 	private SearchViewPage searchPage;
 	private AboutDialog aboutDialog;
+	private ConfigDialog configDialog;
 	
 	public MainFrame(DiaryService service, DiaryShare share) {
 		this.service = service;
@@ -78,9 +77,12 @@ public class MainFrame extends JFrame {
 		
 	}
 	
+	/**
+	 * 初始化主窗口控件
+	 */
 	private void initComponet(){
-		this.setTitle("QQ 日记");
-		this.setSize(800, 500);
+		this.setTitle("清青日记 v1.0");
+		this.setSize(1000, 600);
 		this.setLocationRelativeTo(null);
 		
 		initMenuBar();
@@ -94,6 +96,9 @@ public class MainFrame extends JFrame {
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 	
+	/**
+	 * 初始化菜单
+	 */
 	private void initMenuBar(){
 		menuBar = new JMenuBar();
 		fileMenu = new JMenu("文件");
@@ -113,6 +118,7 @@ public class MainFrame extends JFrame {
 					@Override
 					public Object callback(Object param) {
 						// TODO Auto-generated method stub
+						managepPage.saveFolderItem((DiaryFolder)param);
 						return null;
 					}
 				}).show();
@@ -126,7 +132,20 @@ public class MainFrame extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				new DiaryDialog((DiaryService)service, (DiaryShare)service, null).show();
+				if(managepPage.getUiFolders().isEmpty()){
+					JOptionPane.showMessageDialog( null , "当前无分类，请先添加分类！");
+					return;
+				}
+				
+				new DiaryDialog(managepPage.getUiFolders(), null, new ICallback() {
+					
+					@Override
+					public Object callback(Object param) {
+						// TODO Auto-generated method stub
+						managepPage.saveDiaryItem((GeneralDiary)param);
+						return null;
+					}
+				}).show();
 			}
 		});
 		
@@ -137,7 +156,7 @@ public class MainFrame extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				showWelcomeView();
+				exitSystem();
 			}
 		});
 		
@@ -184,7 +203,7 @@ public class MainFrame extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				
+				configDialog.show();
 			}
 		});
 		
@@ -219,6 +238,9 @@ public class MainFrame extends JFrame {
 		menuBar.add(helpMenu);
 	}
 	
+	/**
+	 * 初始化工具栏
+	 */
 	private void initToolBar(){
 		toolBar = new JToolBar();
 		//toolBar.setBorder(BorderFactory.createLineBorder(Color.w));
@@ -252,7 +274,7 @@ public class MainFrame extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+				configDialog.show();
 			}
 		});
 		
@@ -287,12 +309,16 @@ public class MainFrame extends JFrame {
 		toolBar.add(exitDiaryBtn, null);
 	}
 	
+	/**
+	 * 初始化显示视图
+	 */
 	private void initViewComponet() {
 		
-		welcomePage = new WelcomeViewPage("");
-		managepPage = new ManageViewPage("");
-		searchPage = new SearchViewPage("");
+		welcomePage = new WelcomeViewPage();
+		managepPage = new ManageViewPage(service, share);
+		searchPage = new SearchViewPage(service);
 		aboutDialog = new AboutDialog();
+		configDialog = new ConfigDialog();
 		
 
 		viewLayout = new CardLayout();
@@ -317,10 +343,16 @@ public class MainFrame extends JFrame {
 		viewLayout.show(viewPanel, "查询视图");
 	}
 	
+	/**
+	 * 显示关于对话框
+	 */
 	private void showAboutDialog() {
 		aboutDialog.show();
 	}
 	
+	/**
+	 * 退出函数
+	 */
 	private void exitSystem() {
 		int select = JOptionPane.showConfirmDialog( null , "确定要退出！" , "提示", JOptionPane.YES_NO_OPTION );
 		if (select == JOptionPane.YES_OPTION) {

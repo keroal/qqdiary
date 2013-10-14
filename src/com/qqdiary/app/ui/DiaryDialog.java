@@ -6,18 +6,22 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.DefaultListModel;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
-import javax.swing.JFrame;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
@@ -26,20 +30,27 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.JToolBar;
 import javax.swing.border.TitledBorder;
 
 import com.qqdiary.app.closure.Callback;
-import com.qqdiary.app.module.CurrentDateInformation;
+import com.qqdiary.app.closure.ICallback;
+import com.qqdiary.app.module.DayInformationProvider;
 import com.qqdiary.app.module.DiaryAttachment;
 import com.qqdiary.app.module.DiaryFolder;
 import com.qqdiary.app.module.GeneralDiary;
-import com.qqdiary.app.service.DiaryService;
-import com.qqdiary.app.service.DiaryShare;
+import com.qqdiary.app.module.DiaryAttachment.AttachmentStatus;
+import com.qqdiary.app.ui.manageview.AttachmentFileFilter;
+import com.qqdiary.app.ui.manageview.AttachmentListCellRender;
+import com.qqdiary.app.ui.manageview.IconImageFactory;
 
+/**
+ * 日记显示、编辑界面类
+ * @author Administrator
+ *
+ */
 public class DiaryDialog extends JDialog {
-	private DiaryService service;
-	private DiaryShare share;
+	
+	private ICallback callback;
 	private GeneralDiary diary;
 	private List<DiaryFolder> folderList;
 	
@@ -69,33 +80,35 @@ public class DiaryDialog extends JDialog {
 	private JButton cancelButton;
 	private	JButton addPicButton;
 	private JButton addVoiButton;
-	private JButton clearButton;
+	private JButton delAttachButton;
 	private JButton modifyButton;
 	
 	
-	public DiaryDialog(DiaryService serivce, DiaryShare share, GeneralDiary dariy) {
+	public DiaryDialog(List<DiaryFolder> folderList, GeneralDiary diary, ICallback callback) {
 		// TODO Auto-generated constructor stub
-		this.service = serivce;
-		this.share = share;
+		this.folderList = folderList;
+		this.callback = callback;
 		this.diary = diary;
 		
-		initFolderList();
 		initComponet();
+		
+		/**通过判断传入的日记对象是否为空，来决定界面数据初始化流程*/
 		if (this.diary != null) {
+			this.diary.setNew(false);
 			initCompValue(this.diary);
+			setModifyLock(false);
 		}else {
+			this.diary = new GeneralDiary();
 			initCompValue();
+			setModifyLock(true);
 		}
+
 	}
 	
-	private void initFolderList(){
-		//folderList = service.getDiaryFolderList();
-		folderList = new ArrayList<DiaryFolder>();
-		folderList.add(new DiaryFolder("nihao", "bbbbb"));
-	}
-	
+	/**窗口界面初始化*/
 	private void initComponet() {
-		setSize(900, 480);
+		this.setSize(900, 480);
+		this.setTitle("日记编写");
 		this.setLocationRelativeTo(null);
 		this.setLayout(new BorderLayout());
 		
@@ -109,6 +122,10 @@ public class DiaryDialog extends JDialog {
 		
 	}
 	
+	/**
+	 * 构造界面数据容器
+	 * @return
+	 */
 	private JPanel createDatePanel(){
 		JPanel panel = new JPanel();
 		panel.setPreferredSize(new Dimension(0, 24));
@@ -180,7 +197,6 @@ public class DiaryDialog extends JDialog {
 	    weatherPopupMenu.add(snowItem);
 	   
 		weatherLabel.addMouseListener(new MouseListener() {
-			
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				// TODO Auto-generated method stub
@@ -218,6 +234,10 @@ public class DiaryDialog extends JDialog {
 		return panel;
 	}
 	
+	/**
+	 * 构造标题数据容器
+	 * @return
+	 */
 	private JPanel createTitlePanel() {
 		JPanel panel = new JPanel();
 		panel.setPreferredSize(new Dimension(0, 30));
@@ -245,6 +265,10 @@ public class DiaryDialog extends JDialog {
 		return panel;
 	}
 	
+	/**
+	 * 构造内容数据容器
+	 * @return
+	 */
 	private JPanel createContentPanel() {
 		JPanel panel = new JPanel(new BorderLayout());
 		
@@ -256,10 +280,31 @@ public class DiaryDialog extends JDialog {
 		JPanel rightPanel = new JPanel(new BorderLayout());
 		rightPanel.setPreferredSize(new Dimension(200, 0));
 		rightPanel.setBorder(new TitledBorder("附件"));
+
+		AttachmentListCellRender cellRender = new AttachmentListCellRender();
 		listModel = new DefaultListModel();
 		attachList = new JList(listModel);
-		ListCellRenderWithIcon lcr = new ListCellRenderWithIcon();
-		attachList.setCellRenderer(lcr);
+		attachList.setCellRenderer(cellRender);
+		attachList.addMouseListener(new MouseAdapter() {
+		    public void mousePressed(MouseEvent e) {
+			     
+			}
+			public void mouseReleased(MouseEvent e) {
+			    
+			}
+			private void showMenu(MouseEvent e) {
+			    
+			}
+			
+			public void mouseClicked(MouseEvent e){  
+		        if(e.getClickCount()==2){   
+		        	openDiaryAttachment();
+		        }  
+		    }  
+			
+		});
+		
+		
 		rightPanel.add(new JScrollPane(attachList), "Center");
 	    
 		panel.add(leftPanel, "Center");
@@ -267,9 +312,12 @@ public class DiaryDialog extends JDialog {
 		return panel;
 	}
 	
+	/**
+	 * 构造按钮控件容器
+	 * @return
+	 */
 	private JPanel createToolbarPanel(){
 		JPanel panel = new JPanel(new BorderLayout());
-		//panel.setPreferredSize(new Dimension(200, 0));
 		
 		JPanel rightPanel = new JPanel();
 		storeButton = new JButton("保存");
@@ -278,19 +326,10 @@ public class DiaryDialog extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				
+				saveDiary();
 			}
 		});
 		
-		clearButton = new JButton("清空");
-		clearButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
 		
 		cancelButton = new JButton("退出");
 		cancelButton.addActionListener(new ActionListener() {
@@ -298,7 +337,7 @@ public class DiaryDialog extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				int select = JOptionPane.showConfirmDialog( null , "确定要退出！" , "提示", JOptionPane.YES_NO_OPTION );
+				int select = JOptionPane.showConfirmDialog( null , "确定直接退出？" , "提示", JOptionPane.YES_NO_OPTION );
 				if (select == JOptionPane.YES_OPTION) {
 					dispose();
 				}
@@ -311,7 +350,24 @@ public class DiaryDialog extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
+				JFileChooser chooser = new JFileChooser();
+				chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+				chooser.setDialogTitle("选择图片");
 				
+				
+				//设置文件类型过滤
+				chooser.setAcceptAllFileFilterUsed(false);  
+				String imageExts[] = { "jpg", "jpeg", "png", "gif","bmp" };
+				AttachmentFileFilter filter = new AttachmentFileFilter(imageExts,
+		                "Images Files(*.jpg;*.jpeg;*.png;*.gif;*.bmp)");
+		        chooser.setFileFilter(filter);
+		        
+		        int result = chooser.showOpenDialog(null);
+		        if(result == JFileChooser.APPROVE_OPTION)
+		        {
+		           String path = chooser.getSelectedFile().getAbsolutePath();
+		           addPicAttachmentToList(path);
+		        }
 			}
 		});
 		
@@ -326,23 +382,58 @@ public class DiaryDialog extends JDialog {
 					@Override
 					protected Object callbackFunc(Object param) {
 						// TODO Auto-generated method stub
+						addVoiAttachmentToList((String)param);
 						return null;
 					}
 				}).show();
 			}
 		});
 		
-		
-		
+		delAttachButton = new JButton("删除附件");
+		delAttachButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				int select = JOptionPane.showConfirmDialog( null , "确定要删除附件！" , "提示", JOptionPane.YES_NO_OPTION );
+				if (select == JOptionPane.NO_OPTION) {
+					return;
+				}
+				
+				int[] selectIndies =  attachList.getSelectedIndices();
+				if( selectIndies.length == 0){
+					return;
+				}
+				
+				Object[] delList = attachList.getSelectedValues();
+				for (Object object : delList) {
+					if (((DiaryAttachment)object).getStatus() == AttachmentStatus.EXIST) {
+						((DiaryAttachment)object).setStatus(AttachmentStatus.DELETE);
+						listModel.removeElement(object);
+					}
+					
+				}
+				
+				attachList.updateUI();
+			}
+		});
 		
 		rightPanel.add(addPicButton);
 		rightPanel.add(addVoiButton);
-		rightPanel.add(clearButton);
+		rightPanel.add(delAttachButton);
 		rightPanel.add(storeButton);
 		rightPanel.add(cancelButton);
 		
 		JPanel leftPanel = new JPanel();
 		modifyButton = new JButton("编辑");
+		modifyButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				setModifyLock(true);
+			}
+		});
 		leftPanel.add(modifyButton);
 		
 		panel.add(rightPanel, "East");
@@ -350,12 +441,19 @@ public class DiaryDialog extends JDialog {
 		return panel;
 	}
 	
-
+	/**
+	 * 界面数据初始化
+	 * （日记对象为空的情况）
+	 */
 	private void initCompValue(){
-		setUITime(CurrentDateInformation.getInstance().getDateTime());
-		setUIWeather(CurrentDateInformation.getInstance().getWeather());
+		setUITime(DayInformationProvider.getInstance().getDateTime());
+		setUIWeather(DayInformationProvider.getInstance().getWeather());
 	}
 	
+	/**
+	 * 界面数据初始化
+	 * （日记对象不为空）
+	 */
 	private void initCompValue(GeneralDiary diary){
 		setUITime(diary.getDate());
 		setUIWeather(diary.getWeather());
@@ -368,6 +466,9 @@ public class DiaryDialog extends JDialog {
 		
 	}
 	
+	/**
+	 * 保存界面数据到日记对象
+	 */
 	private void assembleDiary(){
 		diary.setDate(getUITime());
 		diary.setWeather(getUIWeather());
@@ -378,6 +479,14 @@ public class DiaryDialog extends JDialog {
 			diary.setHasAttachement(false);
 		}else {
 			diary.setHasAttachement(true);
+			
+			/**修改日记附件列表，如果没有就插入*/
+			for (DiaryAttachment attachment : getUIAttachments()) {
+				if (!diary.getAttachmentList().contains(attachment)) {
+					diary.getAttachmentList().add(attachment);
+				}
+			}
+			
 		}
 		
 	}
@@ -425,22 +534,117 @@ public class DiaryDialog extends JDialog {
 	}
 	
 	public void setUIAttachments(List<DiaryAttachment> attachments) {
-		
+		for (DiaryAttachment diaryAttachment : attachments) {
+			/** 判断主要是为了保证对修改后保持在本地的日记附件的过滤*/
+			if (diaryAttachment.getStatus() != AttachmentStatus.DELETE) {
+				diaryAttachment.setStatus(AttachmentStatus.EXIST);
+				listModel.addElement(diaryAttachment);
+			}
+		}
+		attachList.updateUI();
 	}
 	
 	public List<DiaryAttachment> getUIAttachments(){
-		return null;
+		List<DiaryAttachment> attachments = new ArrayList<DiaryAttachment>();
+		for (int i = 0; i < listModel.getSize(); i++) {
+			DiaryAttachment attachment = (DiaryAttachment)listModel.getElementAt(i);
+			attachments.add(attachment);
+		}
+		return attachments;
 	}
 	
-	public void setUILock(boolean lock) {
+	
+	/**
+	 * 设置编辑锁
+	 * @param lock
+	 */
+	public void setModifyLock(boolean lock) {
 		this.titleField.setEditable(lock);
+		this.weatherLabel.setEnabled(lock);
 		this.folderComboBox.setEnabled(lock);
 		this.docPanel.setEditable(lock);
 		
 		this.addPicButton.setEnabled(lock);
 		this.addVoiButton.setEnabled(lock);
-		this.clearButton.setEnabled(lock);
+		this.delAttachButton.setEnabled(lock);
 		this.storeButton.setEnabled(lock);
+	}
+
+	/**
+	 * 添加附件响应函数
+	 * @param path
+	 */
+	private void addPicAttachmentToList(String path) {
+		DiaryAttachment attachment = new DiaryAttachment();
+		attachment.setDiaryId(diary.getId());
+		attachment.setType("图片");
+		attachment.setPath(path);
+		listModel.addElement(attachment);
+		attachList.updateUI();
+	}
+	
+	/**
+	 * 添加语音响应函数
+	 * @param path
+	 */
+	private void addVoiAttachmentToList(String path) {
+		DiaryAttachment attachment = new DiaryAttachment();
+		attachment.setDiaryId(diary.getId());
+		attachment.setType("语音");
+		attachment.setPath(path);listModel.addElement(attachment);
+		attachList.updateUI();
+	}
+	
+	/**
+	 * 删除附件响应函数
+	 * @param attachment
+	 */
+	private void removeAttachment(DiaryAttachment attachment) {
+		File file = new File(attachment.getPath());
+		if (file.exists()) {
+			file.delete();
+		}
+		listModel.removeElement(attachment);
+	}
+	
+	
+	/**
+	 * 双击打开附件响应函数
+	 */
+	private void openDiaryAttachment(){
+		DiaryAttachment attachment = (DiaryAttachment)attachList.getSelectedValue();
+
+		String path = "";
+		if (attachment.getStatus() == AttachmentStatus.EXIST  ) {
+			path = System.getProperty("user.dir") + "\\" + attachment.getPath();
+		}else {
+			path = attachment.getPath();
+		}
+		
+		File file = new File(path);
+		if (!file.exists()) {
+			JOptionPane.showMessageDialog( null , "附件文件不存在！");
+			return;
+		}
+		
+		try{
+			if (attachment.getType().contains("图片")) {
+				Runtime.getRuntime().exec("rundll32 c:\\Windows\\System32\\shimgvw.dll,ImageView_Fullscreen "+path);
+			} else if (attachment.getType().contains("语音")) {
+				Runtime.getRuntime().exec("\"C:\\Program Files\\Windows Media Player\\wmplayer.exe\" \""+ path + "\"");	
+			}
+		 }catch (IOException e){
+	            e.printStackTrace();
+	     }
+	}
+	
+	/**
+	 * 保存日记操作响应函数
+	 */
+	private void saveDiary() {
+		assembleDiary();
+		this.callback.callback(diary);
+		this.dispose();
 	}
 	
 	

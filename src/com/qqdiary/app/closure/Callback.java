@@ -1,6 +1,10 @@
 package com.qqdiary.app.closure;
 
-
+/**
+ * 回调函数超类定义
+ * @author Administrator
+ *
+ */
 abstract public class Callback implements ICallback {
     protected ICallback parent;
 
