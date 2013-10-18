@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.qqdiary.app.MainApp;
 import com.qqdiary.app.module.DiaryAttachment;
 import com.qqdiary.app.module.DiaryFolder;
 import com.qqdiary.app.module.GeneralDiary;
@@ -53,11 +54,10 @@ public class DiaryDaoImp implements DiaryDao {
 		try {
 			Class.forName(connString);
 			conn = DriverManager.getConnection(sqldatabase);
-
-			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			MainApp.logger.error(e);
 			return false;
 		}
 		return true;
@@ -67,9 +67,10 @@ public class DiaryDaoImp implements DiaryDao {
 	private boolean sqldisconnect() {
 		try {
 			conn.close();
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			MainApp.logger.error(e);
 			return false;
 		}
 		return true;
@@ -101,6 +102,7 @@ public class DiaryDaoImp implements DiaryDao {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			MainApp.logger.error(e);
 		}
 		
 		sqldisconnect();
@@ -132,6 +134,7 @@ public class DiaryDaoImp implements DiaryDao {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			MainApp.logger.error(e);
 		}
 		
 		sqldisconnect();
@@ -165,9 +168,10 @@ public class DiaryDaoImp implements DiaryDao {
 		    ps.setString(1, idsStr);
 			ps.executeUpdate();
 		
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			MainApp.logger.error(e);
 		}
 	}
 	
@@ -187,9 +191,10 @@ public class DiaryDaoImp implements DiaryDao {
 		    ps.setString(1, idsStr);
 			ps.executeUpdate();
 		
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			MainApp.logger.error(e);
 		}
 		deleteAttachments(diaries);
 		sqldisconnect();
@@ -209,9 +214,10 @@ public class DiaryDaoImp implements DiaryDao {
 			ps.setInt(7, diary.isHasAttachement()?1:0);
 			ps.executeUpdate();
 			
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			MainApp.logger.error(e);
 		}
 	}
 	
@@ -229,9 +235,10 @@ public class DiaryDaoImp implements DiaryDao {
 
 			ps.setString(7, diary.getId());
 		    ps.executeUpdate();
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			MainApp.logger.error(e);
 		}
 		
 	}
@@ -259,9 +266,10 @@ public class DiaryDaoImp implements DiaryDao {
 			ps.setString(4, attachment.getPath());			
 			ps.executeUpdate();
 			
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			MainApp.logger.error(e);
 		}
 		
 	}
@@ -273,9 +281,10 @@ public class DiaryDaoImp implements DiaryDao {
 		    ps.setString(1, diary.getId());
 			ps.executeUpdate();
 		
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			MainApp.logger.error(e);
 		}
 		
 	}
@@ -287,9 +296,10 @@ public class DiaryDaoImp implements DiaryDao {
 		    ps.setString(1, attachment.getId());
 			ps.executeUpdate();
 		
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			MainApp.logger.error(e);
 		}
 	}
 	
@@ -314,9 +324,10 @@ public class DiaryDaoImp implements DiaryDao {
 				attachments.add(diaryattachment);
 			}
 		
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			MainApp.logger.error(e);
 		}
 		
 		sqldisconnect();
@@ -343,9 +354,10 @@ public class DiaryDaoImp implements DiaryDao {
 				folder.setNew(false);
 				folderList.add(folder);
 			}
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			MainApp.logger.error(e);
 		}
 		sqldisconnect();
 		return folderList;
@@ -361,9 +373,10 @@ public class DiaryDaoImp implements DiaryDao {
 		    ps.setString(1, folder.getId());
 			ps.executeUpdate();
 		
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			MainApp.logger.error(e);
 		}
 		sqldisconnect();
 	}
@@ -392,9 +405,10 @@ public class DiaryDaoImp implements DiaryDao {
 			
 			ps.executeUpdate();
 			
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			MainApp.logger.error(e);
 		}
 	}
 	
@@ -407,9 +421,10 @@ public class DiaryDaoImp implements DiaryDao {
 			ps.setString(1, folder.getName());
 			ps.setString(2, folder.getDescribe());
 			ps.executeUpdate();
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			MainApp.logger.error(e);
 		}
 	}	
 	

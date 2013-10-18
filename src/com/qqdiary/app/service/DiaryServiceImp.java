@@ -9,12 +9,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+import com.qqdiary.app.MainApp;
 import com.qqdiary.app.dao.DiaryDao;
 import com.qqdiary.app.dao.DiaryDaoImp;
 import com.qqdiary.app.module.DiaryAttachment;
 import com.qqdiary.app.module.DiaryFolder;
 import com.qqdiary.app.module.GeneralDiary;
 import com.qqdiary.app.module.SearchParameters;
+import com.qqdiary.app.module.User;
 
 /**
  * 服务层操作类
@@ -55,8 +57,8 @@ public class DiaryServiceImp implements DiaryService , DiaryShare, UserVerify{
             outputStream.close();	
 		}
 	    catch (Exception e) { 
-	        System.out.println("复制单个文件操作出错"); 
 	        e.printStackTrace(); 
+			MainApp.logger.error(e);
 	        } 
 	}
 	
@@ -183,13 +185,13 @@ public class DiaryServiceImp implements DiaryService , DiaryShare, UserVerify{
 
 
 	@Override
-	public boolean userVerify(String name, String key) {
+	public boolean userVerify(User user) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public void userRegister() {
+	public void userRegister(User user) {
 		// TODO Auto-generated method stub	
 	}
 
